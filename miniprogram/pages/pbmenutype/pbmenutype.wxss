@@ -1,0 +1,61 @@
+/* 管理员操作样式-- 菜谱分类 */
+.adminPerson {
+  margin-top: 10px;
+}
+/* 菜谱分类列表 */
+.cpfllb .btn {
+  padding:0rpx 20rpx;
+  font-size: 10px;
+  line-height: 30px;
+  color: #fff;
+  border-radius: 10rpx;
+}
+.cpfllb .txt{
+  font-size: 26rpx;
+  color: #F6623A;
+  width: 160rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cpfllb view {
+  width: 48.5%;
+  height: 110rpx;
+  border: 1px solid #ccc;
+  float: left;
+  margin-left: 6rpx;
+  margin-top: 4rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-radius: 25rpx;
+  box-sizing: border-box;
+  padding: 4rpx 10rpx;
+
+
+}
+
+/* 分类添加按钮 */
+.cptjfl,.cpxgfl {
+  clear: both;
+  /* border: 1px solid #999; */
+  /* border-radius: 20rpx; */
+}
+
+.cpfllb .fladd {
+  display: flex;
+  justify-content: center;
+}
+
+.cpfllb .fladd1 {
+  display: flex;
+  justify-content: center;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.cpfllb .fladd image {
+  width: 35px;
+  height: 35px;
+}

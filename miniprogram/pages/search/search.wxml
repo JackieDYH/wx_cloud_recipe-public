@@ -1,0 +1,42 @@
+<view>
+  <!-- 设置搜索栏 -->
+  <view class="search">
+    <view class="search_view">
+      <icon type="search"></icon>
+      <input value="{{keyword}}" bindinput="_changeKeyword" placeholder="搜索菜谱" />
+    </view>
+    <text bindtap="_goSearchList">搜索</text>
+  </view>
+  <!-- 热门搜索  9个即可 -->
+  <view class="hotsearch">
+    <view class="hotsearch_title">
+      <text>热门菜谱</text>
+    </view>
+    <view class="hotsearch_list" wx:if="{{hotList.length > 0}}">
+      <!-- 列表 -->
+      <view class="hot" wx:for="{{hotList}}" wx:key="_id" data-id="{{item._id}}" bindtap="_goToRecipeDetail">{{item.recipeName}}</view>
+    </view>
+    <block wx:else>
+        <view class="list">暂无记录</view>
+    </block>
+  </view>
+  <!-- 近期搜索  存入缓存 -->
+  <view class="jqsearch">
+    <view class="jqsearch_title">
+      <text>近期搜索</text>
+      <text class="clearbtn" bindtap="_removebtn">清空记录</text>
+    </view>
+    <view class="jqsearch_list">
+      <!-- 列表 -->
+      <block wx:if="{{historySearch.length > 0}}">
+        <view class="hist" wx:for="{{historySearch}}" wx:key="*this" bindtap="_goToList" data-keyword="{{item}}">{{item}}</view>
+      </block>
+      <block wx:else>
+        <view>
+          暂无记录
+        </view>
+      </block>
+
+    </view>
+  </view>
+</view>

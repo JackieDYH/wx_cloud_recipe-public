@@ -1,0 +1,191 @@
+<!-- 用户信息显示位置 -->
+	<view class='userInfo'>
+		<image src='/static/personal/background.jpg' class='userinfo_img'></image>
+		<view class='userinfo_info'>
+			<!-- 如果没有登录，显示未登录图片 -->
+			<block wx:if="{{ !isLogin }}">
+				<image src='/static/personal/user.png'></image>
+				<!-- 显示登录按钮 -->
+				<button size='mini' class="btn-login" open-type="getUserInfo" bindgetuserinfo="_doLogin">登录</button>
+			</block>
+			<!-- 登录之后显示的内容 -->
+			<block wx:else>
+				<!-- 点击头像，进行  {发布菜谱分类} （必须是管理员的情况） -->
+				<image src="{{userInfo.avatarUrl}}" bindtap="_goRecipeTypePage"></image>
+				<text class="nickname">欢迎: {{userInfo.nickName}}</text>
+			</block>
+
+		</view>
+
+	</view>
+
+	<!-- 页面选项卡内容 -->
+	<!-- 选项卡选项 -->
+	<view class="topTabSwiper" wx:if="{{isShow}}">
+		<view class="tab {{ indexMenu == '0' ? 'tabBorer' : '' }}" data-index='0' bindtap="_checkMenu">菜谱</view>
+		<view class="tab {{ indexMenu == '1' ? 'tabBorer' : '' }}" data-index='1' bindtap="_checkMenu">分类</view>
+		<view class="tab {{ indexMenu == '2' ? 'tabBorer' : '' }}" data-index='2' bindtap="_checkMenu">关注</view>
+		<view class="tab {{ indexMenu == '3' ? 'tabBorer' : '' }}" data-index='3' wx:if="{{isAdmin}}" bindtap="_checkMenu">审核</view>
+		<view class="tab {{ indexMenu == '4' ? 'tabBorer' : '' }}" data-index='4' wx:if="{{isAdmin}}" bindtap="_checkMenu">通过</view>
+	</view>
+
+
+	<!-- 选项卡对应的内容 580rpx-->
+	<!-- <scroll-view class="content" style="height:580rpx" scroll-y="{{ true }}" bindscrolltolower="_scrolltolower"> -->
+	<view class="content">
+		<!-- 未登录时显示的内容 -->
+		<view wx:if="{{ !isLogin }}" style="text-align:center;margin-top:50px">
+			<image src="/static/personal/tips1.png" class="abcdef"></image>
+			<view style="font-size:14;color:#ccc">登录开启更多神秘功能哦</view>
+		</view>
+
+		<!-- 已登录显示的内容 -->
+		<block wx:else>
+			<!-- 显示菜单列表 style="display:none;" -->
+			<view id="recipeList" hidden="{{indexMenu == '0'? fales : true}}">
+				<view class='swiper_con'>
+					<!-- 菜单列表 -->
+					<scroll-view wx:for="{{userPbRecipes}}" wx:key="_id" style="height:280rpx" class="cdli" scroll-x="{{ true }}">
+						<view class="cdli_info" bindtap="_goToRecipeDetail" data-id="{{item._id}}">
+							<!-- 图片 -->
+							<image src="{{item.fileIds[0]}}"></image>
+							<!-- 文本 -->
+							<text class="recname">{{item.recipeName}}</text>
+						</view>
+						<!-- 删除菜单列表 -->
+						<view class="delCdlb">
+							<!-- 删除菜单列表 style="margin-top:46px;color:#fff;"-->
+							<view class="delbtn" bindtap="_doDeleteRecipe" data-id="{{item._id}}" data-index="{{index}}">
+								<text>删除</text>
+								<!-- <view>编辑</view> -->
+							</view>
+						</view>
+					</scroll-view>
+
+					<!-- 点击添加按钮，显示选择菜谱分类，添加菜单，添加步骤 cdli style="height:280rpx"-->
+					<view class="cdlitj" bindtap="_goToPublishRecipe" wx:if="{{isShow}}">
+						<image src="/static/personal/add.png"></image>
+					</view>
+				</view>
+			</view>
+			<!-- 显示菜单分类列表（菜谱） style="display:none"  ? fales : true-->
+			<view id="typeList" wx:if="{{indexMenu == '1'}}">
+				<view class='swiper_con1' style="text-align: left;" wx:for="{{userTypeName}}" wx:key="_id">
+					<!-- 自己发布过的菜单对应的菜谱分类列表   -->
+					<view class="page">
+						<view class="page__bd">
+							<view class="weui-cells">
+
+								<mp-slideview buttons="{{[{type: 'warn',text: '查看详情',extClass: 'test'}]}}" data-id="{{item._id}}" data-type-name="{{item.typeName}}" bindbuttontap="_goToRecipeList">
+									<mp-cell value="{{item.typeName}}" link footer=""></mp-cell>
+								</mp-slideview>
+								
+							</view>
+						</view>
+
+					</view>
+				</view>
+			</view>
+			<!-- 显示关注菜单列表 -->
+			<view id="followRecipe" hidden="{{indexMenu == '2'? fales : true}}">
+				<view class='swiper_con'>
+					<!-- 列出自己所有关注的菜单菜谱列表，然后通过点击能够调到对应的详情页面 -->
+
+					<scroll-view  style="height:280rpx;" class="cdli" scroll-x="{{ true }}" wx:for="{{userFollowList}}" wx:key="_id">
+
+						<view class="cdli_info" style="text-align:center" bindtap="_goToRecipeDetail" data-id="{{item.userFollow._id}}">
+							<!-- 图片 -->
+							<image src="{{item.userFollow.fileIds[0]}}"></image>
+							<!-- 文本 -->
+							<text class="recname">{{item.userFollow.recipeName}}</text>
+						</view>
+
+						<!-- 删除菜单列表 -->
+						<view class="delCdlb">
+							<!-- 删除菜单列表 style="margin-top:46px;color:#fff;"-->
+							<view class="delbtn" data-index="{{index}}" data-id="{{item._id}}" data-recipe-Id="{{item.recipeId}}" bindtap="_setFollow">
+								取关
+							</view>
+						</view>
+
+						</scroll-view>
+
+					<view wx:if="{{ userFollowList.length == 0 }}" style="text-align:center;margin-top:50px">
+						<image src="/static/personal/tips2.png" class="abcdef"></image>
+						<view style="font-size:14;color:#ccc">您还没有关注菜谱哦</view>
+					</view>
+				</view>
+			</view>
+
+			<!-- 显示待审核菜单列表 -->
+			<view id="followRecipe" hidden="{{indexMenu == '3'? fales : true}}">
+				<view class='swiper_con'>
+					<!-- 列出自己所有关注的菜单菜谱列表，然后通过点击能够调到对应的详情页面 -->
+
+					<scroll-view  style="height:280rpx;" class="cdli" scroll-x="{{ true }}" wx:for="{{examineList}}" wx:key="_id">
+						<view class="cdli_info" style="text-align:center" bindtap="_goToRecipeDetail" data-id="{{item._id}}">
+							<!-- 图片 -->
+							<image src="{{item.fileIds[0]}}"></image>
+							<!-- 文本 -->
+							<text class="recname">{{item.recipeName}}</text>
+						</view>
+
+						<!-- 删除菜单列表 -->
+						<view class="delCdlb"  style="background:#0D8ADB">
+							<!-- 删除菜单列表 style="margin-top:46px;color:#fff;"-->
+							<view class="delbtn" data-index="{{index}}" data-id="{{item._id}}" bindtap="_setRelease">
+								通过
+							</view>
+							
+						</view>
+						<!-- 物理删除 -->
+						<view class="delCdlb">
+							<view class="delbtn dyh" data-index="{{index}}" data-id="{{item._id}}" bindtap="_setdel">
+								删除
+							</view>
+						</view>
+
+						</scroll-view>
+
+					<view wx:if="{{ examineList.length == 0 }}" style="text-align:center;margin-top:50px">
+						<image src="/static/personal/tips2.png" class="abcdef"></image>
+						<view style="font-size:14;color:#ccc">还没有待审核菜谱</view>
+					</view>
+				</view>
+			</view>
+
+			<!-- 显示审核通过菜单列表 -->
+			<view id="followRecipe" hidden="{{indexMenu == '4'? fales : true}}">
+				<view class='swiper_con'>
+					<!-- 列出自己所有关注的菜单菜谱列表，然后通过点击能够调到对应的详情页面 -->
+
+					<scroll-view  style="height:280rpx;" class="cdli" scroll-x="{{ true }}" wx:for="{{adoptList}}" wx:key="_id">
+
+						<view class="cdli_info" style="text-align:center" bindtap="_goToRecipeDetail" data-id="{{item._id}}">
+							<!-- 图片 -->
+							<image src="{{item.fileIds[0]}}"></image>
+							<!-- 文本 -->
+							<text class="recname">{{item.recipeName}}</text>
+						</view>
+
+						<!-- 删除菜单列表 -->
+						<view class="delCdlb">
+							<!-- 删除菜单列表 style="margin-top:46px;color:#fff;"-->
+							<view class="delbtn" data-index="{{index}}" data-id="{{item._id}}" bindtap="_setadopt">
+								下线
+							</view>
+						</view>
+
+						</scroll-view>
+
+					<view wx:if="{{ adoptList.length == 0 }}" style="text-align:center;margin-top:50px">
+						<image src="/static/personal/tips2.png" class="abcdef"></image>
+						<view style="font-size:14;color:#ccc">暂无通过菜谱</view>
+					</view>
+				</view>
+			</view>
+
+		</block>
+
+	<!-- </scroll-view> -->
+	</view>
